@@ -1,0 +1,346 @@
+reated by yutao on 15/3/6.
+
+#main.billboard(role='main', style="margin-top:0; min-height:{{ height - 59 }}px;margin:auto 0;")
+  header(data-ng-include="'/components/navbar/header.html'")
+  //.container(style="margin-top:5px;margin-bottom:5px;")
+    .btn.btn-default(ng-click="updateArticle('',true)")
+      | To Publish
+    .btn.btn-default(ng-click="deleteArticle()", style="margin-left:5px;")
+      | Delete
+  #title.bs-header
+    .container
+      h1(contenteditable="true", name="title", ckeditor="editorOptions", ng-model="title", style="width: 100%",ng-focus="titleFocus=!titleFocus")
+      .pull-right.smart-form(ng-show="titleFocus" style="margin-left: -15px;margin-right: -15px;")
+        .btn-group
+          button.btn.btn-sm.btn-primary(type='button' ng-click="titleFocus=false;cancel()")
+            i.fa.fa-times
+            | {{"Cancel"|translate}}
+        .btn-group(style="margin-left:10px;",ng-click="updateArticle(title);titleFocus=false" )
+          button.btn.btn-sm.btn-success(type='button')
+            i.fa.fa-check
+            | {{"update"|translate}}
+  .container
+    .row.pull-right(style="margin-top:5px;margin-right:-40px;")
+      .btn.btn-primary(ng-click="topublish(rid)", style="background-color:#4D90C9!important;")
+        | {{"Publish"|translate}}
+      .btn.btn-primary(ng-click="deleteArticle()", style="margin-left:5px; background-color:#4D90C9!important;", ng-show="delete")
+        | {{"Delete"|translate}}
+    .row
+      .col-md-3
+        .bs-sidebar.hidden-print.affix-top(role='complementary', style="margin-top:52px")
+          ul.nav.bs-sidenav
+            li.active
+              a(href='#title')
+                span(style='' contenteditable="true", ng-bind-html="title")
+              ul.nav
+                li(ng-repeat="c in blocks")
+                  a(href="#content-{{ $index }}" target="_self" ng-click="scrollTo('#content-'+$index)")
+                    span(contenteditable="true")
+                      | {{ c.title }}
+
+
+      .col-md-9
+        .row.shadow-10(style="margin-top: 15px;margin-bottom:15px;padding-top:10px;", ng-repeat="block in blocks",id="{{block.id}}")
+          .text-center(style="margin-top:-10px")
+            .pull-right(style="margin-right:-20px;width:20px;")
+              .btn.btn-default.btn-sm.pull-left(ng-click="operateBlock('before',block.id,'','')")
+                .fa.fa-long-arrow-up
+              .btn.btn-default.btn-sm.pull-left(style="margin-top:5px;",ng-click="operateBlock('after',block.id,'','')")
+                .fa.fa-long-arrow-down
+              .btn.btn-default.btn-sm.pull-left(style="margin-top:5px;width:27px!important;",ng-click="operateBlock('delete',block.id,'','')")
+                .fa.fa-times(style="margin-left:-2px;")
+
+          article.col-xs-12.col-sm-12.col-md-12.col-lg-12
+            h1(contenteditable="true", name="sub_title", ckeditor="editorOptions",ng-focus="focus=true;", ng-model="block.title", style="width: 100%")
+            hr.no-margin
+            div(id="#content{{$index}}" name='content' ng-focus="focus=true;" ng-model="block.content" ckeditor="editorOptions" contenteditable="true" style="padding-top:5px;")
+            .widget-footer.smart-form(ng-show="focus" style="margin-left: -15px;margin-right: -15px;")
+              .btn-group
+                button.btn.btn-sm.btn-primary(type='button' ng-click="focus=false;cancel()")
+                  i.fa.fa-times
+                  | {{"Cancel"|translate}}
+              .btn-group(style="margin-left:10px;",ng-click="focus=false;operateBlock('update',block.id,block.title,block.content)" )
+                button.btn.btn-sm.btn-success(type='button')
+                  i.fa.fa-check
+                  | {{"update"|translate}}
+
+
+    script(type='text/javascript').
+      /* DO NOT REMOVE : GLOBAL FUNCTIONS!
+       *
+       * pageSetUp(); WILL CALL THE FOLLOWING FUNCTIONS
+       *
+       * // activate tooltips
+       * $("[rel=tooltip]").tooltip();
+       *
+       * // activate popovers
+       * $("[rel=popover]").popover();
+       *
+       * // activate popovers with hover states
+       * $("[rel=popover-hover]").popover({ trigger: "hover" });
+       *
+       * // activate inline charts
+       * runAllCharts();
+       *
+       * // setup widgets
+       * setup_widgets_desktop();
+       *
+       * // run form elements
+       * runAllForms();
+       *
+       ********************************
+       *
+       * pageSetUp() is needed whenever you load a page.
+       * It initializes and checks for all basic elements of the page
+       * and makes rendering easier.
+       *
+       */
+      pageSetUp();
+      /*
+       * ALL PAGE RELATED SCRIPTS CAN GO BELOW HERE
+       * eg alert("my home function");
+       *
+       * var pagefunction = function() {
+       *   ...
+       * }
+       * loadScript("js/plugin/_PLUGIN_NAME_.js", pagefunction);
+       *
+       * TO LOAD A SCRIPT:
+       * var pagefunction = function (){
+       *  loadScript(".../plugin.js", run_after_loaded);
+       * }
+       *
+       * OR
+       *
+       * loadScript(".../plugin.js", run_after_loaded);
+       */
+      // PAGE RELATED SCRIPTS
+      // pagefunction
+      CKEDITOR.disableAutoInline = false;
+
+      var pagefunction = function () {
+
+        CKEDITOR.inline('title', {
+          height: '50px', startupFocus: true, toolbar: [
+            {
+              name: 'document',
+              groups: ['mode', 'document', 'doctools'],
+              items: ['Source', '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates']
+            },
+            {
+              name: 'clipboard',
+              groups: ['clipboard', 'undo'],
+              items: ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo']
+            },
+            {
+              name: 'editing',
+              groups: ['find', 'selection', 'spellchecker'],
+              items: ['Find', 'Replace', '-', 'SelectAll', '-', 'Scayt']
+            },
+            {
+              name: 'forms',
+              items: ['Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField']
+            },
+            '/',
+            {
+              name: 'basicstyles',
+              groups: ['basicstyles', 'cleanup'],
+              items: ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat']
+            },
+            {
+              name: 'paragraph',
+              groups: ['list', 'indent', 'blocks', 'align', 'bidi'],
+              items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl', 'Language']
+            },
+            {name: 'links', items: ['Link', 'Unlink', 'Anchor']},
+            {
+              name: 'insert',
+              items: ['Image', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe']
+            },
+            '/',
+            {name: 'styles', items: ['Styles', 'Format', 'Font', 'FontSize']},
+            {name: 'colors', items: ['TextColor', 'BGColor']},
+            {name: 'tools', items: ['Maximize', 'ShowBlocks']},
+            {name: 'others', items: ['-']},
+            {name: 'about', items: ['About']}
+          ]
+        });
+        CKEDITOR.inline('ckeditor', {height: '600px', startupFocus: true});
+      };
+      //end pagefunction
+      //run pagefunction on load
+//            loadScript("js/plugin/ckeditor/ckeditor.js", pagefunction);
+//
+   Created by yutao on 15/3/6.
+
+#main.billboard(role='main', style="margin-top:0; min-height:{{ height - 59 }}px;margin:auto 0;")
+  header(data-ng-include="'/components/navbar/header.html'")
+  //.container(style="margin-top:5px;margin-bottom:5px;")
+    .btn.btn-default(ng-click="updateArticle('',true)")
+      | To Publish
+    .btn.btn-default(ng-click="deleteArticle()", style="margin-left:5px;")
+      | Delete
+  #title.bs-header
+    .container
+      h1(contenteditable="true", name="title", ckeditor="editorOptions", ng-model="title", style="width: 100%",ng-focus="titleFocus=!titleFocus")
+      .pull-right.smart-form(ng-show="titleFocus" style="margin-left: -15px;margin-right: -15px;")
+        .btn-group
+          button.btn.btn-sm.btn-primary(type='button' ng-click="titleFocus=false;cancel()")
+            i.fa.fa-times
+            | {{"Cancel"|translate}}
+        .btn-group(style="margin-left:10px;",ng-click="updateArticle(title);titleFocus=false" )
+          button.btn.btn-sm.btn-success(type='button')
+            i.fa.fa-check
+            | {{"update"|translate}}
+  .container
+    .row.pull-right(style="margin-top:5px;margin-right:-40px;")
+      .btn.btn-primary(ng-click="topublish(rid)", style="background-color:#4D90C9!important;")
+        | {{"Publish"|translate}}
+      .btn.btn-primary(ng-click="deleteArticle()", style="margin-left:5px; background-color:#4D90C9!important;", ng-show="delete")
+        | {{"Delete"|translate}}
+    .row
+      .col-md-3
+        .bs-sidebar.hidden-print.affix-top(role='complementary', style="margin-top:52px")
+          ul.nav.bs-sidenav
+            li.active
+              a(href='#title')
+                span(style='' contenteditable="true", ng-bind-html="title")
+              ul.nav
+                li(ng-repeat="c in blocks")
+                  a(href="#content-{{ $index }}" target="_self" ng-click="scrollTo('#content-'+$index)")
+                    span(contenteditable="true")
+                      | {{ c.title }}
+
+
+      .col-md-9
+        .row.shadow-10(style="margin-top: 15px;margin-bottom:15px;padding-top:10px;", ng-repeat="block in blocks",id="{{block.id}}")
+          .text-center(style="margin-top:-10px")
+            .pull-right(style="margin-right:-20px;width:20px;")
+              .btn.btn-default.btn-sm.pull-left(ng-click="operateBlock('before',block.id,'','')")
+                .fa.fa-long-arrow-up
+              .btn.btn-default.btn-sm.pull-left(style="margin-top:5px;",ng-click="operateBlock('after',block.id,'','')")
+                .fa.fa-long-arrow-down
+              .btn.btn-default.btn-sm.pull-left(style="margin-top:5px;width:27px!important;",ng-click="operateBlock('delete',block.id,'','')")
+                .fa.fa-times(style="margin-left:-2px;")
+
+          article.col-xs-12.col-sm-12.col-md-12.col-lg-12
+            h1(contenteditable="true", name="sub_title", ckeditor="editorOptions",ng-focus="focus=true;", ng-model="block.title", style="width: 100%")
+            hr.no-margin
+            div(id="#content{{$index}}" name='content' ng-focus="focus=true;" ng-model="block.content" ckeditor="editorOptions" contenteditable="true" style="padding-top:5px;")
+            .widget-footer.smart-form(ng-show="focus" style="margin-left: -15px;margin-right: -15px;")
+              .btn-group
+                button.btn.btn-sm.btn-primary(type='button' ng-click="focus=false;cancel()")
+                  i.fa.fa-times
+                  | {{"Cancel"|translate}}
+              .btn-group(style="margin-left:10px;",ng-click="focus=false;operateBlock('update',block.id,block.title,block.content)" )
+                button.btn.btn-sm.btn-success(type='button')
+                  i.fa.fa-check
+                  | {{"update"|translate}}
+
+
+    script(type='text/javascript').
+      /* DO NOT REMOVE : GLOBAL FUNCTIONS!
+       *
+       * pageSetUp(); WILL CALL THE FOLLOWING FUNCTIONS
+       *
+       * // activate tooltips
+       * $("[rel=tooltip]").tooltip();
+       *
+       * // activate popovers
+       * $("[rel=popover]").popover();
+       *
+       * // activate popovers with hover states
+       * $("[rel=popover-hover]").popover({ trigger: "hover" });
+       *
+       * // activate inline charts
+       * runAllCharts();
+       *
+       * // setup widgets
+       * setup_widgets_desktop();
+       *
+       * // run form elements
+       * runAllForms();
+       *
+       ********************************
+       *
+       * pageSetUp() is needed whenever you load a page.
+       * It initializes and checks for all basic elements of the page
+       * and makes rendering easier.
+       *
+       */
+      pageSetUp();
+      /*
+       * ALL PAGE RELATED SCRIPTS CAN GO BELOW HERE
+       * eg alert("my home function");
+       *
+       * var pagefunction = function() {
+       *   ...
+       * }
+       * loadScript("js/plugin/_PLUGIN_NAME_.js", pagefunction);
+       *
+       * TO LOAD A SCRIPT:
+       * var pagefunction = function (){
+       *  loadScript(".../plugin.js", run_after_loaded);
+       * }
+       *
+       * OR
+       *
+       * loadScript(".../plugin.js", run_after_loaded);
+       */
+      // PAGE RELATED SCRIPTS
+      // pagefunction
+      CKEDITOR.disableAutoInline = false;
+
+      var pagefunction = function () {
+
+        CKEDITOR.inline('title', {
+          height: '50px', startupFocus: true, toolbar: [
+            {
+              name: 'document',
+              groups: ['mode', 'document', 'doctools'],
+              items: ['Source', '-', 'Save', 'NewPage', 'Preview', 'Print', '-', 'Templates']
+            },
+            {
+              name: 'clipboard',
+              groups: ['clipboard', 'undo'],
+              items: ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo']
+            },
+            {
+              name: 'editing',
+              groups: ['find', 'selection', 'spellchecker'],
+              items: ['Find', 'Replace', '-', 'SelectAll', '-', 'Scayt']
+            },
+            {
+              name: 'forms',
+              items: ['Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField']
+            },
+            '/',
+            {
+              name: 'basicstyles',
+              groups: ['basicstyles', 'cleanup'],
+              items: ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat']
+            },
+            {
+              name: 'paragraph',
+              groups: ['list', 'indent', 'blocks', 'align', 'bidi'],
+              items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl', 'Language']
+            },
+            {name: 'links', items: ['Link', 'Unlink', 'Anchor']},
+            {
+              name: 'insert',
+              items: ['Image', 'Flash', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar', 'PageBreak', 'Iframe']
+            },
+            '/',
+            {name: 'styles', items: ['Styles', 'Format', 'Font', 'FontSize']},
+            {name: 'colors', items: ['TextColor', 'BGColor']},
+            {name: 'tools', items: ['Maximize', 'ShowBlocks']},
+            {name: 'others', items: ['-']},
+            {name: 'about', items: ['About']}
+          ]
+        });
+        CKEDITOR.inline('ckeditor', {height: '600px', startupFocus: true});
+      };
+      //end pagefunction
+      //run pagefunction on load
+//            loadScript("js/plugin/ckeditor/ckeditor.js", pagefunction);
+
